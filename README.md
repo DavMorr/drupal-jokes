@@ -14,7 +14,7 @@ We use REST APIs for a number of internal and client applications. We have built
     * The :id parameter is optional. If included, the API should return the joke that matches a node ID or return a 404.
 * The API should respond only to Accept: application/json requests
 * The API should return a JSON object
-* The module should pass Coder module review, follow standard Drupal and PSR-3 coding standards and be reasonably well documented. 
+* The module should pass Coder module review, follow standard Drupal and PHP-FIG coding standards and be reasonably well documented. 
 * When delivered, we should be able to install the module and have a functioning API. 
 
 ### Setup
