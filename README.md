@@ -1,4 +1,4 @@
-# Socha Dev Drupal module exercice
+# Socha Dev Drupal module exercise
 ## Create a simple REST API that serves jokes using Drupal 7.
 
 ### Task
