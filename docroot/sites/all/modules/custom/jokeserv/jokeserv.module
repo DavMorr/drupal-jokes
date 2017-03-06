@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Provides a REST API for a jokes feed routable by the request HTTP Accept Type
+ */
+
+/**
+ * Implements hook_help().
+ */
+function jokeserv_help($path, $arg) {}
+
+/**
+ * Implements hook_menu().
+ */
+function jokeserv_menu() {
+  $items['joke'] = array(
+    'page callback' => '_jokeserv_route',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_jokeserv_resource_info_alter().
+ */
+function jokeserv_jokeserv_resource_info_alter(&$resources) {
+  $resources['json'] = array(
+    'type'            => t('json'),
+    'httpAcceptTypes' => array('application/json'),
+    'class'           => 'JokeServRestJSONController'
+  );
+}
+
+/**
+ * Sets the default reasource values and exposes an alter hook for adding to and
+ *  or modifying the resources array.
+ * @return array
+ */
+function _jokeserv_resource_info() {
+  $resources['default'] = array(
+    'type'            => t('default'),
+    'httpAcceptTypes' => array(),
+    'class'           => 'JokeServRestController'
+  );
+  drupal_alter('jokeserv_resource_info', $resources);
+  return $resources;
+}
+
+/**
+ * Routes the incoming request to the appropraite response processing class
+ */
+function _jokeserv_route() {
+  $resources = _jokeserv_resource_info();
+  $process = new JokeServRouter($resources);
+  $process->routeRequest();
+}
+
+

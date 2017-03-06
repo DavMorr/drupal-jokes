@@ -1,0 +1,17 @@
+name = JokeServ
+description = "Provides a REST API response for joke requests."
+
+package = Custom
+core = 7.x
+
+; files[] = includes/jokeserv.inc
+
+files[] = src/JokeServRouter/JokeServRouter.php
+files[] = src/JokeServRestController/JokeServRestController.php
+files[] = src/JokeServRestJSONController/JokeServRestJSONController.php
+files[] = src/JokeServQuery/JokeServQuery.php
+files[] = src/JokeServException/JokeServException.php
+
+; dependencies[] = xautoload (>= 7.x-5.0)
+; configure = admin/config/jokes
+
