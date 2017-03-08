@@ -6,59 +6,76 @@
 
 // namespace Drupal\jokeserv\JokeServQuery;
 
-class JokeServQuery {
-
+interface JokeServQueryInterface {
   /**
-   * Read action interface
-   * @return array|null
+   * Validation interface definitions
    */
-  public function getJokes() {
-    return $this->getJokesArray($this->getJokeNodes());
+  public function getJokes();
+}
+
+class JokeServQuery implements JokeServQueryInterface {
+
+  protected $jokes_nodes;
+  public $nid;
+  public $jokes;
+
+  public function __construct($_nid = NULL) {
+    $this->nid = $_nid;
   }
 
   /**
-   * fetch an aray of all Joke nodes
-   * @return array
+   * Execute read processes to set title|body jokes array class variable.
+   * Allow for variant formats to be returned, default to array.
    */
-  public function getJokeNodes() {
-    $jokes_items = array();
+  public function getJokes($format = 'array') {
+    $this->_getJokeNodes();
+    switch ($format) {
+      case 'array':
+      default:
+        $this->_setJokesArray();
+        break;
+    }
+  }
+
+  /**
+   * Fetch an array of Joke nodes
+   */
+  public function _getJokeNodes() {
+    $this->jokes_nodes = array();
+    $jokeserv_defaults = _jokeserv_get_defaults();
+    $joke_bundle = variable_get('jokeserv_ctype', $jokeserv_defaults['ctype']);
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'joke')
+      ->entityCondition('bundle', $joke_bundle)
       ->propertyCondition('status', NODE_PUBLISHED)
     ;
+
+    if ($this->nid) {
+      $query->entityCondition('entity_id', $this->nid);
+    }
 
     $result = $query->execute();
 
     if (isset($result['node'])) {
       $jokes_items_nids = array_keys($result['node']);
-      $jokes_items = entity_load('node', $jokes_items_nids);
+      $this->jokes_nodes = entity_load('node', $jokes_items_nids);
     }
-
-    return $jokes_items;
   }
 
   /**
-   * Provides an array of Joke item Q&A pairs (node title and body values)
-   * @param null $joke_nodes
-   *  An array of Joke node objects
-   * @return array|null
+   * Set an array of Joke item Q&A pairs (joke node title and body values)
    */
-  public function getJokesArray($joke_nodes = NULL) {
-    if (!$joke_nodes) {
+  public function _setJokesArray() {
+    if (!$this->jokes_nodes) {
       return NULL;
     }
-    $jnodes = array();
-    foreach ($joke_nodes as $jnode) {
-      $jnodes[] = array(
+    foreach ($this->jokes_nodes as $joke_node) {
+      $this->jokes[] = array(
         //  'nid'   => $jnode->nid,
-        'title' => $jnode->title,
-        'body'  => $jnode->body['und'][0]['value'],
+        'title' => $joke_node->title,
+        'body'  => $joke_node->body['und'][0]['value'],
       );
     }
-
-    return $jnodes;
   }
-
 }

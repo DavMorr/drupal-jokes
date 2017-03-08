@@ -6,7 +6,19 @@
  */
 
 /**
+ * Define any local defaults here so that they are clogging the variables table
+ * @return array
+ */
+function _jokeserv_get_defaults() {
+  $defaults = array(
+    'ctype' => 'joke',
+  );
+  return $defaults;
+}
+
+/**
  * Implements hook_help().
+ * @todo create help text
  */
 function jokeserv_help($path, $arg) {}
 
@@ -19,19 +31,40 @@ function jokeserv_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
+  $items['joke/%'] = array(
+    'page callback' => '_jokeserv_route',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/config/services/jokeserv'] = array(
+    'title' => 'JokeServ config',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jokeserv_admin_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'includes/jokeserv.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
 
   return $items;
 }
 
 /**
- * Implements hook_jokeserv_resource_info_alter().
+ * Routes the incoming request to the appropriate response processing class
+ * @param string $arg
+ *  Optional single node selector, must validate as a joke type node id preceded
+ *  by a colon character ':'
  */
-function jokeserv_jokeserv_resource_info_alter(&$resources) {
-  $resources['json'] = array(
-    'type'            => t('json'),
-    'httpAcceptTypes' => array('application/json'),
-    'class'           => 'JokeServRestJSONController'
-  );
+function _jokeserv_route($arg = NULL) {
+  // Validate optional URL path argument as valid nid, set nid value or null.
+  $validate = new JokeServValidate($arg);
+  $validate->validateArgSetNid();
+  // Aggregate defined resources info
+  $resources = _jokeserv_resource_info();
+  // Instantiate and execute request processes
+  $process = new JokeServRouter($resources, $validate->nid);
+  $process->routeRequest();
 }
 
 /**
@@ -41,21 +74,21 @@ function jokeserv_jokeserv_resource_info_alter(&$resources) {
  */
 function _jokeserv_resource_info() {
   $resources['default'] = array(
-    'type'            => t('default'),
+    'type' => t('default'),
     'httpAcceptTypes' => array(),
-    'class'           => 'JokeServRestController'
+    'class' => 'JokeServRestController'
   );
   drupal_alter('jokeserv_resource_info', $resources);
   return $resources;
 }
 
 /**
- * Routes the incoming request to the appropraite response processing class
+ * Implements hook_jokeserv_resource_info_alter().
  */
-function _jokeserv_route() {
-  $resources = _jokeserv_resource_info();
-  $process = new JokeServRouter($resources);
-  $process->routeRequest();
+function jokeserv_jokeserv_resource_info_alter(&$resources) {
+  $resources['json'] = array(
+    'type' => t('json'),
+    'httpAcceptTypes' => array('application/json'),
+    'class' => 'JokeServRestJSONController'
+  );
 }
-
-

@@ -13,7 +13,6 @@
 interface JokeServRestControllerInterface {
   /**
    * Rest API CRUD interface definitions
-   * @return mixed
    */
   public function read();
   public function create();
@@ -23,7 +22,10 @@ interface JokeServRestControllerInterface {
 
 class JokeServRestController implements JokeServRestControllerInterface {
 
-  public function __construct() {}
+  public $nid;
+  public function __construct($_nid = NULL) {
+    $this->nid = $_nid;
+  }
 
   /**
    * Rest API CRUD top level member functions.

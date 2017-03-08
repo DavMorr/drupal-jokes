@@ -1,6 +1,6 @@
 
-JokeServe Module Readme
-======================
+JokeServe Module - Readme
+=======================
 
 # The JokeServ REST API module
 ## Contributed for your all of remote joke delivery needs.
@@ -11,7 +11,13 @@ The operations exposed via the class interface are the standard create, read, up
 
 The above can be tesed from the command line:
 
-    curl -i -H "Accept: application/json" -X GET [site_address]/joke
+    curl -i -H "Accept: application/json" -X GET http[s]://[site_address]/joke
+
+The above returns a list of all jokes.  To retrieve a single joke by node ID (NID), a path segment can be appended to the URL, but must be preceded by a colon character ':' to be recognized and validated:
+
+    curl -i -H "Accept: application/json" -X GET ttp[s]://[site_address]/joke/:123
+
+Multiple NIDs are not currently supported.  Failed NID validations fail-back to the full joke list.  Validated NID values are passed to the `JokeServRestController` super class and available to derived classes as `this->nid` for convenience.
 
 To add, modify or extend a resource, a hook function is provided: 
  - `hook_jokeserv_resource_info_alter()` 
@@ -32,10 +38,10 @@ Ex:
 
 The basic CRUD member functions are exposed in the super-class `JokeServRestController`
 
- - public function read();
- - public function create();   
- - public function update();   
- - public function delete();
+     - public function read();
+     - public function create();   
+     - public function update();   
+     - public function delete();
 
 Note: by default, these functions all resolve to a 404 custom exception from the `JokeServRestController` class if not overriden from a derived class.
 
@@ -52,4 +58,4 @@ A Query class is also provided, but this and the response process can be easily 
 Refer to the module, class and api code files for reference.
 
 Note: 
-The menu path is fixed to the [domain]/joke , which can be overriden via menu alter hook or redirect.
+The menu paths fixed to `[domain]/joke` and `[domain]/joke/:[nid]`

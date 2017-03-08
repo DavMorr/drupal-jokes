@@ -12,6 +12,7 @@ class JokeServRouter {
   protected $resources;
   protected $validHttpAcceptTypes = array();
   public $resource;
+  public $nid;
   public $request_method;
   public $restMap = array();
 
@@ -19,9 +20,12 @@ class JokeServRouter {
    * JokeServRouter constructor.
    * @param $_resources
    *  Assigns request specific resource params to a public member variable
+   * @param $_nid
+   *  Optional nid value for resolving a single joke node
    */
-  public function __construct($_resources) {
+  public function __construct($_resources, $_nid = NULL) {
     $this->resources = $_resources;
+    $this->nid = $_nid;
   }
 
   /**
@@ -77,7 +81,6 @@ class JokeServRouter {
    */
   public function routeRequest() {
     $this->setCurrentResource();
-
     try {
       $this->processRequest();
     }
@@ -93,10 +96,8 @@ class JokeServRouter {
 
     $this->setRestMap();
     $this->request_method = $this->getRequestMethod();
-    $this->controller = new $this->resource['class']();
-
+    $this->controller = new $this->resource['class']($this->nid);
     $procType = (in_array($this->request_method, $this->restMap)) ? $this->restMap[$this->request_method] : $this->restMap['GET'];
-
     $this->controller->$procType();
   }
 }

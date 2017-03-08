@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Run code exclusive to this module's install, uninstall, enable, and disable
+ *  operations.
+ */
+
+/**
+ * Implements hook_install()
+ */
+function jokeserv_install() {
+  // load defaults array, from the .module file
+  $defaults = _jokeserv_get_defaults();
+  // create a default basic Joke content type, if not exists
+  _jokeserv_make_type($defaults['ctype']);
+  // set the default Joke content type
+  variable_set('jokeserv_ctype', $defaults['ctype']);;
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function jokeserv_uninstall() {
+  variable_del('jokeserv_ctype');
+}
+
+/**
+ * Creates a default joke content type if not present.
+ */
+function _jokeserv_make_type($type_type = 'joke') {
+  //  Verify the content type does not already exist, return if it does.
+  if (array_key_exists($type_type, node_type_get_names())) {
+      return;
+  }
+
+  //  Create the type definition array.
+  $type_name = ucwords($type_type);
+  $type = array(
+    'type' => $type_type,
+    'name' => $type_name,
+    'base' => 'node_content',
+    'description' => st( 'Default Joke content type.' ),
+    'custom' => 1,
+    'modified' => 1,
+    'locked' => 0,
+  );
+
+  // Set, save, create the default joke content type.
+  $type = node_type_set_defaults( $type );
+  node_type_save( $type );
+  //  Add a body field to the bundle.
+  node_add_body_field( $type );
+}
