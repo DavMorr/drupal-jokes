@@ -3,21 +3,21 @@ JokeServe Module - Readme
 =======================
 
 # The JokeServ REST API module
-## Contributed for your all of remote joke delivery needs.
+## Contributed for your remote joke delivery needs.
 
 This module provides a REST API allowing developers a flexible means for defining and or overriding custom CRUD operations via a hook and classes.  
 
 The operations exposed via the class interface are the standard create, read, update and delete ops.  Included with the module are a read operation from incoming requests of the server HTTP Access Type 'application/json' and the read action/member function determined by the server request method 'GET', mainly for demonstration purposes. 
 
-The above can be tesed from the command line:
+The above can be tested from the command line:
 
     curl -i -H "Accept: application/json" -X GET http[s]://[site_address]/joke
 
 The above returns a list of all jokes.  To retrieve a single joke by node ID (NID), a path segment can be appended to the URL, but must be preceded by a colon character ':' to be recognized and validated:
 
-    curl -i -H "Accept: application/json" -X GET ttp[s]://[site_address]/joke/:123
+    curl -i -H "Accept: application/json" -X GET http[s]://[site_address]/joke/:123
 
-Multiple NIDs are not currently supported.  Failed NID validations fail-back to the full joke list.  Validated NID values are passed to the `JokeServRestController` super class and available to derived classes as `this->nid` for convenience.
+Multiple NIDs are not currently supported.  Failed NID validations fail-back to the full joke list.  Validated NID value is passed to the `JokeServRestController` super class and is available to derived classes as `$this->nid` for convenience.
 
 To add, modify or extend a resource, a hook function is provided: 
  - `hook_jokeserv_resource_info_alter()` 
